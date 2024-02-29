@@ -12,6 +12,11 @@
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.KeyVault/vaults/ReenbitBlobTriggerFunc",
       "type": "secrets.keyVault",
       "connectionId": "VaultUri"
+    },
+    "compute.appService1": {
+      "group": "connections",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/reenbittesttask2286",
+      "type": "compute.appService.windows"
     }
   }
 }

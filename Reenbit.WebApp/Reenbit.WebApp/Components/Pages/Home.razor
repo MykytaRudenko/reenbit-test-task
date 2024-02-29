@@ -1,0 +1,54 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Http.HttpResults
+@using Microsoft.AspNetCore.Mvc
+@using Reenbit.WebApp.Services
+@rendermode RenderMode.InteractiveServer
+
+<h3>Upload DOCX File</h3>
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    <p>@Message</p>
+}
+
+<EditForm FormName="upload-file-form" Model="model" OnValidSubmit="@HandleUpload">
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <InputText class="form-control-email" id="email" @bind-Value="model.Email" required />
+    </div>
+    <div class="form-group">
+        <label for="file">Choose DOCX File:</label>
+        <InputFile class="form-control-file" id="file" OnChange="@HandleFileSelected" accept=".docx" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+</EditForm>
+
+@code 
+{
+    private string Message { get; set; }
+    private Model model = new Model();
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        model.File = e.File;
+    }
+    
+    public async Task HandleUpload(EditContext context)
+    {
+        var service = new FileService();
+        var result = await service.UploadAsync(model.Email, model.File);
+        if (result != null)
+        {
+            Message = $"File uploaded successfully! Email: {model.Email}";
+        }
+        StateHasChanged();
+    }
+
+    class Model
+    {
+        public string Email { get; set; }
+        public IBrowserFile File { get; set; }
+    }
+}

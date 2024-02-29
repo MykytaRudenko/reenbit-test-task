@@ -8,16 +8,11 @@ using Azure.Storage.Sas;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Reenbit.BlobTriggerFunc.Validators;
-using Azure.Security.KeyVault.Secrets;
-using Azure.Identity;
-using Microsoft.Extensions.Configuration;
 
 namespace Reenbit.BlobTriggerFunc
 {
     public class Function1
     {
-        private const string _connectionString = "DefaultEndpointsProtocol=https;AccountName=reenbitblobstorage2286;AccountKey=73850Gxmw67HGPWL+3346DtISJQWBhw1MUgoEROyqNjY0QxGBd3jFjBioD2WUR63qVJElkB0ruRr+AStoRrCXA==;BlobEndpoint=https://reenbitblobstorage2286.blob.core.windows.net/;TableEndpoint=https://reenbitblobstorage2286.table.core.windows.net/;QueueEndpoint=https://reenbitblobstorage2286.queue.core.windows.net/;FileEndpoint=https://reenbitblobstorage2286.file.core.windows.net/";
-        private readonly string _containerName = "files";
         private const uint SAS_TOKEN_EXPIRY_IN_HOURS = 1;
 
         [FunctionName("SendEmailFunction")]
@@ -44,8 +39,11 @@ namespace Reenbit.BlobTriggerFunc
                 }
                 return;
             }
+            
+            var connectionString = Environment.GetEnvironmentVariable("WEBSITE_CONTENTAZUREFILECONNECTIONSTRING");
+            var containerName = Environment.GetEnvironmentVariable("WEBSITE_CONTENTSHARE");
 
-            var blobContainerClient = new BlobContainerClient(_connectionString, _containerName);
+            var blobContainerClient = new BlobContainerClient(connectionString, containerName);
 
             var client = blobContainerClient.GetBlobClient(name);
             
@@ -74,10 +72,12 @@ namespace Reenbit.BlobTriggerFunc
 
         private void SendEmail(string userEmail, string blobName, string sasLink, ILogger log)
         {
-            string senderEmail = "mykyta.rudenko04@gmail.com";
-            string senderPassword = "xbLrT4aHAVDsK7c0";
+            string senderEmail = Environment.GetEnvironmentVariable("SENDER_EMAIL");
+            string senderPassword = Environment.GetEnvironmentVariable("SENDER_PASSWORD");
+            string senderUri = Environment.GetEnvironmentVariable("SENDER_URI");
+            int senderPort = int.Parse(Environment.GetEnvironmentVariable("SENDER_PORT"));
 
-            var smtpClient = new SmtpClient("smtp-relay.brevo.com", 587)
+            var smtpClient = new SmtpClient(senderUri, senderPort)
             {
                 EnableSsl = true,
                 Credentials = new NetworkCredential(senderEmail, senderPassword)
@@ -87,7 +87,7 @@ namespace Reenbit.BlobTriggerFunc
             {
                 From = new MailAddress(senderEmail),
                 Subject = "Reenbit Test Task Sender",
-                Body = $"Your file {blobName} have been successfuly uploaded to blob storage \n Here is link with SAS than will be availible 1 hour: \n {sasLink}",
+                Body = $"Your file have been successfuly uploaded to blob storage \n Here is link with SAS than will be availible 1 hour: \n <a href=\"{sasLink}\">{blobName}</a>",
                 IsBodyHtml = true
             };
 

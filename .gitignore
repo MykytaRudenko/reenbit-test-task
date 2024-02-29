@@ -136,7 +136,6 @@ node_modules/
 # Visual Studio Code directories
 .vscode/
 
-.github
 appsettings.json
 
 

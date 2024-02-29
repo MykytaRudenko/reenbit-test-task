@@ -4,7 +4,7 @@
   "parameters": {
     "resourceGroupName": {
       "type": "string",
-      "defaultValue": "testresourse",
+      "defaultValue": "reenbittesttask2286_group",
       "metadata": {
         "_parameterType": "resourceGroup",
         "description": "Имя группы ресурсов для ресурса. Рекомендуется поместить ресурсы в одну группу ресурсов для более удобного отслеживания."
@@ -36,7 +36,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('ReenbitBlobTriggerFunc20240228190516', subscription().subscriptionId)))]",
+      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('reenbittesttask2286', subscription().subscriptionId)))]",
       "resourceGroup": "[parameters('resourceGroupName')]",
       "apiVersion": "2019-10-01",
       "dependsOn": [
@@ -49,7 +49,7 @@
           "contentVersion": "1.0.0.0",
           "resources": [
             {
-              "name": "ReenbitBlobTriggerFunc20240228190516",
+              "name": "reenbittesttask2286",
               "type": "microsoft.insights/components",
               "location": "[parameters('resourceLocation')]",
               "kind": "web",

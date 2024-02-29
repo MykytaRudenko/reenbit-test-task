@@ -2,10 +2,9 @@
   "dependencies": {
     "appInsights1": {
       "secretStore": "AzureAppSettings",
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/microsoft.insights/components/ReenbitBlobTriggerFunc20240228190516",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/microsoft.insights/components/reenbittesttask2286",
       "type": "appInsights.azure",
-      "connectionId": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-      "dynamicId": null
+      "connectionId": "APPLICATIONINSIGHTS_CONNECTION_STRING"
     }
   }
 }

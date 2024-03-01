@@ -47,9 +47,13 @@
     {
         var service = new FileService();
         var result = await service.UploadAsync(_model.Email, _model.File);
-        if (result != null)
+        if (result.Success)
         {
             _message = $"File uploaded successfully! Email: {_model.Email}";
+        }
+        else
+        {
+            _message = result.ErrorMessage;
         }
         StateHasChanged();
     }

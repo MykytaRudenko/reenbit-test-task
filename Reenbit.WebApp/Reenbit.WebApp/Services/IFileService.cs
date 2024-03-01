@@ -6,6 +6,6 @@ namespace Reenbit.WebApp.Services
 {
     public interface IFileService
     {
-        Task<Response<BlobContentInfo>> UploadAsync(string email, IBrowserFile file);
+        Task<Models.FileUploadResult> UploadAsync(string email, IBrowserFile file);
     }
 }

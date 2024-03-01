@@ -4,6 +4,11 @@ using Reenbit.WebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddUserSecrets<Program>();
+
+Environment.SetEnvironmentVariable("CONNECTION_STRING", builder.Configuration["CONNECTION_STRING"]);
+Environment.SetEnvironmentVariable("CONTAINER_NAME", builder.Configuration["CONTAINER_NAME"]);
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

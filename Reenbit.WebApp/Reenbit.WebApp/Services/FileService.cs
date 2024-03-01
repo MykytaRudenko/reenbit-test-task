@@ -1,14 +1,14 @@
-﻿using Azure;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
+﻿using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.Extensions.Options;
+using Azure.Storage.Blobs.Models;
+using Reenbit.WebApp.Models;
 
 namespace Reenbit.WebApp.Services
 {
     public class FileService : IFileService
-    { 
+    {
         private readonly BlobContainerClient _blobContainer;
+
         public FileService()
         {
             string connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
@@ -16,10 +16,33 @@ namespace Reenbit.WebApp.Services
             _blobContainer = new BlobContainerClient(connectionString, containerName);
         }
 
-        public async Task<Response<BlobContentInfo>> UploadAsync(string email, IBrowserFile file)
+        public FileService(BlobContainerClient blobContainer)
         {
-            Response<BlobContentInfo> result;
+            _blobContainer = blobContainer;
+        }
+
+        public async Task<Models.FileUploadResult> UploadAsync(string email, IBrowserFile file)
+        {
+            var uploadResult = new Models.FileUploadResult();
             
+            var validator = new UploadFileParamsValidator();
+
+            var validationResults = validator.Validate(new UploadFileRequest
+            {
+                Email = email,
+                File = file
+            });
+            
+            if (!validationResults.IsValid)
+            {
+                foreach (var failure in validationResults.Errors)
+                {
+                    uploadResult.Success = false;
+                    uploadResult.ErrorMessage = failure.ErrorMessage;
+                    return uploadResult;
+                }
+            }
+
             BlobClient client = _blobContainer.GetBlobClient(file.Name);
             IDictionary<string, string> metadata = new Dictionary<string, string>
             {
@@ -30,19 +53,30 @@ namespace Reenbit.WebApp.Services
             {
                 await using (Stream data = file.OpenReadStream())
                 {
-                    result = await client.UploadAsync(data, new BlobUploadOptions
+                    var response = await client.UploadAsync(data, new BlobUploadOptions
                     {
                         HttpHeaders = new BlobHttpHeaders { ContentType = "application/octet-stream" },
                         Metadata = metadata
                     });
+
+                    uploadResult.FileUrl = client.Uri.AbsoluteUri;
+                    uploadResult.Success = true;
                 }
             }
             catch (Exception ex)
             {
-                return null;
+                uploadResult.ErrorMessage = ex.Message;
+                uploadResult.Success = false;
             }
 
-            return result;
+            return uploadResult;
         }
+    }
+
+    public class FileUploadResult
+    {
+        public bool Success { get; set; }
+        public string FileUrl { get; set; }
+        public string ErrorMessage { get; set; }
     }
 }

@@ -7,14 +7,13 @@ namespace Reenbit.WebApp.Services
 {
     public class FileService
     {
-        private readonly string _connectionString = "DefaultEndpointsProtocol=https;AccountName=reenbitblobstorage2286;AccountKey=73850Gxmw67HGPWL+3346DtISJQWBhw1MUgoEROyqNjY0QxGBd3jFjBioD2WUR63qVJElkB0ruRr+AStoRrCXA==;EndpointSuffix=core.windows.net";
-        private readonly string _containerName = "files";
-        
         private readonly BlobContainerClient _blobContainer;
 
         public FileService()
         {
-            _blobContainer = new BlobContainerClient(_connectionString, _containerName);
+            string connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+            string containerName = Environment.GetEnvironmentVariable("CONTAINER_NAME");
+            _blobContainer = new BlobContainerClient(connectionString, containerName);
         }
 
         public async Task<Response<BlobContentInfo>> UploadAsync(string email, IBrowserFile file)

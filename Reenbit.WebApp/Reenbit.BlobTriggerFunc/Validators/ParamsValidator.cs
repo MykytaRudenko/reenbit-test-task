@@ -1,15 +1,9 @@
 ﻿using FluentValidation;
-using Microsoft.Identity.Client;
 using Reenbit.BlobTriggerFunc.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Reenbit.BlobTriggerFunc.Validators
 {
-    internal class ParamsValidator : AbstractValidator<TriggerParams>
+    public class ParamsValidator : AbstractValidator<TriggerParams>
     {
         public ParamsValidator()
         {
@@ -18,7 +12,13 @@ namespace Reenbit.BlobTriggerFunc.Validators
 
             RuleFor(x => x.Metadata)
                     .NotEmpty().WithMessage("Metadata is required.")
-                    .Must(metadata => metadata.ContainsKey("UserEmail")).WithMessage("UserEmail is required in metadata.");
+                    .Must(metadata => metadata.ContainsKey("UserEmail") && !string.IsNullOrEmpty(metadata["UserEmail"])).WithMessage("UserEmail is required in metadata.");
+
+            RuleFor(x => x.Blob)
+                .NotNull().WithMessage("Blob is required");
+
+            RuleFor(x => x.Log)
+                .NotNull().WithMessage("Logger is required");
         }
     }
 }

@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Hosting;
 using Reenbit.WebApp.Components;
+using Reenbit.WebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddScoped<IFileService, FileService>();
 
 var app = builder.Build();
 

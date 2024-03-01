@@ -2,13 +2,13 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.Extensions.Options;
 
 namespace Reenbit.WebApp.Services
 {
-    public class FileService
-    {
+    public class FileService : IFileService
+    { 
         private readonly BlobContainerClient _blobContainer;
-
         public FileService()
         {
             string connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");

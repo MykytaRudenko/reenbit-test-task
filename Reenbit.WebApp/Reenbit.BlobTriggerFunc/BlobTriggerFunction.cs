@@ -11,7 +11,7 @@ using Reenbit.BlobTriggerFunc.Validators;
 
 namespace Reenbit.BlobTriggerFunc
 {
-    public class Function1
+    public class BlobTriggerFunction
     {
         private const uint SAS_TOKEN_EXPIRY_IN_HOURS = 1;
 
@@ -29,6 +29,8 @@ namespace Reenbit.BlobTriggerFunc
             {
                 Name = name,
                 Metadata = metadata,
+                Blob = myBlob,
+                Log = log
             });
 
             if (!validationResults.IsValid)
@@ -95,7 +97,7 @@ namespace Reenbit.BlobTriggerFunc
 
             smtpClient.SendMailAsync(mailMessage);
 
-            log.LogError($"Email sent successful");
+            log.LogInformation($"Email sent successful");
         }
     }
 }

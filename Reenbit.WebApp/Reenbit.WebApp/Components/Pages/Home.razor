@@ -3,52 +3,54 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Http.HttpResults
 @using Microsoft.AspNetCore.Mvc
+@using Reenbit.WebApp.Models
 @using Reenbit.WebApp.Services
 @rendermode RenderMode.InteractiveServer
 
-<h3>Upload DOCX File</h3>
+<link href="app.css" rel="stylesheet" />
 
-@if (!string.IsNullOrEmpty(Message))
+<section class="upload-group">
+    <h3>Upload DOCX File</h3>
+
+    <EditForm class="form" FormName="upload-file-form" Model="_model" OnValidSubmit="@HandleUpload">
+        <div class="form-group">
+            <label class="form-item" for="email">Email:</label>
+            <InputText class="form-item form-control-email" id="email" @bind-Value="_model.Email" required />
+        </div>
+        <div class="form-group">
+            <label class="form-item" for="file">Choose DOCX File:</label>
+            <InputFile class="form-item form-control-file" id="file" OnChange="@HandleFileSelected" accept=".docx" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </EditForm>
+</section>
+
+
+@if (!string.IsNullOrEmpty(_message))
 {
-    <p>@Message</p>
+    <div class="message-box">
+        <p>@_message</p>
+    </div>
 }
-
-<EditForm FormName="upload-file-form" Model="model" OnValidSubmit="@HandleUpload">
-    <div class="form-group">
-        <label for="email">Email:</label>
-        <InputText class="form-control-email" id="email" @bind-Value="model.Email" required />
-    </div>
-    <div class="form-group">
-        <label for="file">Choose DOCX File:</label>
-        <InputFile class="form-control-file" id="file" OnChange="@HandleFileSelected" accept=".docx" required />
-    </div>
-    <button type="submit" class="btn btn-primary">Upload</button>
-</EditForm>
 
 @code 
 {
-    private string Message { get; set; }
-    private Model model = new Model();
+    private string? _message { get; set; }
+    private Model _model = new Model();
 
-    private void HandleFileSelected(InputFileChangeEventArgs e)
+    private void HandleFileSelected(InputFileChangeEventArgs args)
     {
-        model.File = e.File;
+        _model.File = args.File;
     }
     
     public async Task HandleUpload(EditContext context)
     {
         var service = new FileService();
-        var result = await service.UploadAsync(model.Email, model.File);
+        var result = await service.UploadAsync(_model.Email, _model.File);
         if (result != null)
         {
-            Message = $"File uploaded successfully! Email: {model.Email}";
+            _message = $"File uploaded successfully! Email: {_model.Email}";
         }
         StateHasChanged();
-    }
-
-    class Model
-    {
-        public string Email { get; set; }
-        public IBrowserFile File { get; set; }
     }
 }

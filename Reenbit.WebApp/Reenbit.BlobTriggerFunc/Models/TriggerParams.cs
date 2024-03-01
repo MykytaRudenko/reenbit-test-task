@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace Reenbit.BlobTriggerFunc.Models
 {
-    internal class TriggerParams
+    public class TriggerParams
     {
         public string Name { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
+        public Stream Blob { get; set; }
+        public ILogger Log { get; set; }
     }
 }

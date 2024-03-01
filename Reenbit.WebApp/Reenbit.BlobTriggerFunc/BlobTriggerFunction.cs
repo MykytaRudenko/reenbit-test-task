@@ -6,6 +6,7 @@ using System.Net;
 using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Reenbit.BlobTriggerFunc.Validators;
 
@@ -14,6 +15,13 @@ namespace Reenbit.BlobTriggerFunc
     public class BlobTriggerFunction
     {
         private const uint SAS_TOKEN_EXPIRY_IN_HOURS = 1;
+
+        private readonly IConfiguration _configuration;
+
+        public BlobTriggerFunction(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
 
         [FunctionName("SendEmailFunction")]
         public void Run([BlobTrigger("files/{name}", 
@@ -42,8 +50,8 @@ namespace Reenbit.BlobTriggerFunc
                 return;
             }
             
-            var connectionString = Environment.GetEnvironmentVariable("WEBSITE_CONTENTAZUREFILECONNECTIONSTRING");
-            var containerName = Environment.GetEnvironmentVariable("WEBSITE_CONTENTSHARE");
+            var connectionString = Environment.GetEnvironmentVariable("WEBSITE_CONTENTAZUREFILECONNECTIONSTRING") ?? _configuration["WEBSITE_CONTENTAZUREFILECONNECTIONSTRING"];
+            var containerName = Environment.GetEnvironmentVariable("WEBSITE_CONTENTSHARE") ?? _configuration["WEBSITE_CONTENTSHARE"];
 
             var blobContainerClient = new BlobContainerClient(connectionString, containerName);
 
@@ -74,10 +82,14 @@ namespace Reenbit.BlobTriggerFunc
 
         private void SendEmail(string userEmail, string blobName, string sasLink, ILogger log)
         {
-            string senderEmail = Environment.GetEnvironmentVariable("SENDER_EMAIL");
-            string senderPassword = Environment.GetEnvironmentVariable("SENDER_PASSWORD");
-            string senderUri = Environment.GetEnvironmentVariable("SENDER_URI");
-            int senderPort = int.Parse(Environment.GetEnvironmentVariable("SENDER_PORT"));
+            string senderEmail = Environment.GetEnvironmentVariable("SENDER_EMAIL") ?? _configuration["SENDER_EMAIL"];
+            string senderPassword = Environment.GetEnvironmentVariable("SENDER_PASSWORD") ?? _configuration["SENDER_PASSWORD"];
+            string senderUri = Environment.GetEnvironmentVariable("SENDER_URI") ?? _configuration["SENDER_URI"];
+            int senderPort;
+            if(!int.TryParse(Environment.GetEnvironmentVariable("SENDER_PORT"), out senderPort))
+            {
+                senderPort = int.Parse(_configuration["SENDER_PORT"]);
+            }
 
             var smtpClient = new SmtpClient(senderUri, senderPort)
             {
